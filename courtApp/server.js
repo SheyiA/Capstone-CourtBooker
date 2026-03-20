@@ -93,6 +93,25 @@ app.get("/court/:id/status", (req, res) => {
     );
 });
 
+
+
+// see courts
+app.get("/courts", (req, res) => {
+
+    pool.query(
+        "SELECT * FROM courts ORDER BY id",
+        (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({ error: "Database error" });
+            }
+
+            res.json(result.rows);
+        }
+    );
+
+});
+
 // checkout or leave court
 app.post("/checkout", (req, res) => {
     const courtId = req.body.court_id;

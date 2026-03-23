@@ -86,7 +86,7 @@ app.get("/court/:id/status", (req, res) => {
     const courtId = req.params.id;
     // query for db to get all from sessions where the courtid is active 
     pool.query(
-        "SELECT COUNT(*) FROM sessions WHERE court_id = $1 AND status = 'active'", [courtId],
+        "SELECT COUNT(*) AS active_players FROM sessions WHERE court_id = $1 AND checkout_time IS NULL AND checkin_time > NOW() - INTERVAL '30 minutes';", [courtId],
         (err, result) => {
             if (err) {
                 console.log(err);

@@ -28,15 +28,15 @@ function Dashboard() {
     data.forEach(court => fetchStatus(court.id));
   };
 
-  const fetchStatus = async (courtId) => {
-    const res = await fetch(`http://localhost:3000/court/${courtId}/status`);
-    const data = await res.json();
+const fetchStatus = async (courtId) => {
+  const res = await fetch(`http://localhost:3000/court/${courtId}/status`);
+  const data = await res.json();
 
-    setOccupancy(prev => ({
-      ...prev,
-      [courtId]: data.active_players
-    }));
-  };
+  setOccupancy(prev => ({
+    ...prev,
+    [courtId]: Number(data.active_players)
+  }));
+};
 
   const refreshAllOccupancy = () => {
   courts.forEach(court => {

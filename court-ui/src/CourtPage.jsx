@@ -7,6 +7,7 @@ function CourtPage() {
   const [players, setPlayers] = useState(0);
   const [isCheckedIn, setIsCheckedIn] = useState(false); //track if checked in state
   const [remainingTime, setRemainingTime] = useState(null);
+const [startTime, setStartTime] = useState(null);
 
   const fetchStatus = async () => {
     const res = await fetch(`http://localhost:3000/court/${id}/status`);
@@ -19,19 +20,26 @@ const checkIn = async () => {
 
   if (isCheckedIn) return;
 
-  await fetch("http://localhost:3000/checkin", {
+  const res = await fetch("http://localhost:3000/checkin", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ court_id: id })
   });
-// local storate 
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert(data.error);   // ⭐ shows backend message
+    return;
+  }
+
   localStorage.setItem("activeCourt", id);
-localStorage.setItem("checkinTime", Date.now());
-  setIsCheckedIn(true);
+const now = Date.now();
+localStorage.setItem("checkinTime", now);
 
-  fetchStatus();
+setStartTime(now);
+setIsCheckedIn(true);
 };
-
 // check out route for court page
 const checkOut = async () => {
 
@@ -50,6 +58,46 @@ const checkOut = async () => {
   fetchStatus();
 };
 
+
+
+useEffect(() => {
+  const storedCourt = localStorage.getItem("activeCourt");
+  const storedTime = localStorage.getItem("checkinTime");
+
+  if (storedCourt && storedTime && storedCourt === id) {
+    setIsCheckedIn(true);
+    setStartTime(parseInt(storedTime));
+  }
+}, [id]);
+
+
+useEffect(() => {
+  if (!isCheckedIn || !startTime) return;
+
+  const interval = setInterval(() => {
+
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const remaining = 1800 - elapsed;
+
+    if (remaining <= 0) {
+      setIsCheckedIn(false);
+      localStorage.removeItem("activeCourt");
+      localStorage.removeItem("checkinTime");
+      clearInterval(interval);
+      setRemainingTime(0);
+      return;
+    }
+
+    setRemainingTime(remaining);
+
+  }, 1000);
+
+  return () => clearInterval(interval);
+
+}, [isCheckedIn, startTime]);
+
+
+
 useEffect(() => {
 
   fetchStatus();
@@ -63,32 +111,9 @@ useEffect(() => {
 }, []);
 
 
-useEffect(() => {
 
-  const interval = setInterval(() => {
 
-    const start = localStorage.getItem("checkinTime");
 
-    if (!start) return;
-
-    const elapsed = Date.now() - start;
-    const remaining = 30 * 60 * 1000 - elapsed;
-
-    if (remaining <= 0) {
-      localStorage.removeItem("activeCourt");
-      localStorage.removeItem("checkinTime");
-      setIsCheckedIn(false);
-      setRemainingTime(0);
-      return;
-    }
-
-    setRemainingTime(Math.floor(remaining / 1000));
-
-  }, 1000);
-
-  return () => clearInterval(interval);
-
-}, []);
 
 return (
   <div style={{

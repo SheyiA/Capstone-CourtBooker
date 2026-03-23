@@ -1,157 +1,162 @@
-// global variables 
 const express = require("express");
-const app = express();
-const PORT = 3000;
-app.use(express.json());
+const cors = require("cors");
 const pool = require("./db");
 
-const cors = require("cors");
+const app = express();
+const PORT = 3000;
+
 app.use(cors());
-// open port to run on local host
+app.use(express.json());
+
+/* ================= ROUTES ================= */
+
+// CHECKIN
+app.post("/checkin", async(req, res) => {
+    const { court_id } = req.body;
+
+    try {
+        const active = await pool.query(
+            `SELECT * FROM sessions
+       WHERE court_id = $1
+       AND status = 'active'
+       AND start_time > NOW() - INTERVAL '30 minutes'
+       LIMIT 1`, [court_id]
+        );
+
+        if (active.rows.length > 0) {
+            return res.status(400).json({
+                error: "Court already in use"
+            });
+        }
+
+        const result = await pool.query(
+            `INSERT INTO sessions (court_id, start_time, status)
+       VALUES ($1, NOW(), 'active')
+       RETURNING *`, [court_id]
+        );
+
+        res.json({
+            message: "Check-in successful",
+            session: result.rows[0]
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Database error" });
+    }
+});
+
+
+// STATUS
+app.get("/court/:id/status", async(req, res) => {
+    const courtId = req.params.id;
+
+    try {
+        const result = await pool.query(
+            `SELECT COUNT(*) AS active_players
+       FROM sessions
+       WHERE court_id = $1
+       AND status = 'active'
+       AND start_time > NOW() - INTERVAL '30 minutes'`, [courtId]
+        );
+
+        res.json({
+            court_id: courtId,
+            active_players: parseInt(result.rows[0].active_players)
+        });
+
+    } catch (err) {
+        res.status(500).json({ error: "Database error" });
+    }
+});
+
+
+// COURTS
+app.get("/courts", async(req, res) => {
+    const result = await pool.query("SELECT * FROM courts ORDER BY id");
+    res.json(result.rows);
+});
+
+
+// CHECKOUT
+app.post("/checkout", async(req, res) => {
+    const { court_id } = req.body;
+
+    const result = await pool.query(
+        `UPDATE sessions
+     SET end_time = CURRENT_TIMESTAMP,
+         status = 'completed'
+     WHERE id = (
+        SELECT id FROM sessions
+        WHERE court_id = $1
+        AND status = 'active'
+        ORDER BY start_time ASC
+        LIMIT 1
+     )
+     RETURNING *`, [court_id]
+    );
+
+    res.json({ message: "Checkout successful" });
+});
+
+
+
+app.get("/admin/analytics", async(req, res) => {
+    try {
+
+        // ⭐ total active players right now (within 30 min window)
+        const activePlayersResult = await pool.query(`
+      SELECT COUNT(*) AS total_active_players
+      FROM sessions
+      WHERE status = 'active'
+      AND start_time > NOW() - INTERVAL '30 minutes'
+    `);
+
+        // ⭐ total sessions created today
+        const sessionsTodayResult = await pool.query(`
+      SELECT COUNT(*) AS sessions_today
+      FROM sessions
+      WHERE DATE(start_time) = CURRENT_DATE
+    `);
+
+        // ⭐ busiest court today (most sessions)
+        const busiestCourtResult = await pool.query(`
+      SELECT courts.name, COUNT(sessions.id) AS session_count
+      FROM sessions
+      JOIN courts ON courts.id = sessions.court_id
+      WHERE DATE(sessions.start_time) = CURRENT_DATE
+      GROUP BY courts.name
+      ORDER BY session_count DESC
+      LIMIT 1
+    `);
+
+        // ⭐ usage ranking for all courts
+        const usageRankingResult = await pool.query(`
+      SELECT courts.name, COUNT(sessions.id) AS session_count
+      FROM sessions
+      JOIN courts ON courts.id = sessions.court_id
+      GROUP BY courts.name
+      ORDER BY session_count DESC
+    `);
+
+        res.json({
+            total_active_players: parseInt(activePlayersResult.rows[0].total_active_players),
+            sessions_today: parseInt(sessionsTodayResult.rows[0].sessions_today),
+            busiest_court: busiestCourtResult.rows[0] || null,
+            court_usage: usageRankingResult.rows
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Analytics query failed" });
+    }
+});
+
+
+
+
+/* ================= START SERVER LAST ================= */
 
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-    // db connection test
-    // query for db 
-    pool.query("SELECT * FROM courts", (err, result) => {
-        // if db error 
-        if (err) {
-            console.log("DB ERROR", err);
-        } else {
-            //else log successful connection 
-            console.log("DB CONNECTED SUCCESS");
-            console.log(result.rows);
-        }
-    });
-    // test adding into sessions
-    // query for sessions 
-    pool.query(
-        "INSERT INTO sessions (court_id) VALUES ($1) RETURNING *", [1],
-        (err, result) => { // error check 
-            if (err) {
-                console.log("INSERT ERROR:", err);
-            } else {
-                console.log("SESSION CREATED:");
-                console.log(result.rows);
-            }
-        },
-    );
-});
-
-// api route
-// app.post("/checkin", (req, res) => {
-//   const courtId = req.body.court_id;
-//   pool.query(
-//     "INSERT INTO sessions (court_id) VALUES ($1) RETURNING *",
-//     [courtId],
-//     (err, result) => {
-//       if (err) {
-//         console.log(err);
-//         res.status(500).json({ error: "Database error" });
-//       } else {
-//         res.json({
-//           message: "Check-in successful",
-//           session: result.rows[0],
-//         });
-//       }
-//     },
-//   );
-// });
-
-// proper check in route for api 
-app.post("/checkin", (req, res) => {
-    // log request body 
-    console.log("BODY:", req.body);
-    // court id is request body and get courtid specific 
-    const courtId = req.body.court_id;
-    // query for sesssions with court id 
-    pool.query(
-        "INSERT INTO sessions (court_id) VALUES ($1) RETURNING *", [courtId],
-        (err, result) => {
-            if (err) {
-                console.log("DB ERROR:", err);
-                return res.status(500).json({ error: err.message });
-            }
-            // response.json 
-            res.json({
-                message: "Check-in successful",
-                session: result.rows[0],
-            });
-        },
-    );
-});
-
-// count person route
-app.get("/court/:id/status", (req, res) => {
-    const courtId = req.params.id;
-    // query for db to get all from sessions where the courtid is active 
-    pool.query(
-        "SELECT COUNT(*) AS active_players FROM sessions WHERE court_id = $1 AND checkout_time IS NULL AND checkin_time > NOW() - INTERVAL '30 minutes';", [courtId],
-        (err, result) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({ error: "Database error" });
-            }
-
-            res.json({
-                court_id: courtId,
-                active_players: result.rows[0].count,
-            });
-        },
-    );
-});
-
-
-
-// see courts
-app.get("/courts", (req, res) => {
-    // query to get all courts 
-    pool.query(
-        "SELECT * FROM courts ORDER BY id",
-        (err, result) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({ error: "Database error" });
-            }
-
-            res.json(result.rows);
-        }
-    );
-
-});
-
-// checkout or leave court
-app.post("/checkout", (req, res) => {
-    const courtId = req.body.court_id;
-    // query to update the sessions status should refresh the court 
-    pool.query(
-        `
-        UPDATE sessions
-        SET end_time = CURRENT_TIMESTAMP,
-            status = 'completed'
-        WHERE id = (
-            SELECT id FROM sessions
-            WHERE court_id = $1
-            AND status = 'active'
-            ORDER BY start_time ASC
-            LIMIT 1
-        )
-        RETURNING *
-        `, [courtId],
-        (err, result) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({ error: "Database error" });
-            }
-            // db error section 
-            if (result.rows.length === 0) {
-                return res.json({ message: "No active session found" });
-            }
-
-            res.json({
-                message: "Checkout successful",
-                session: result.rows[0],
-            });
-        },
-    );
+    console.log(`Server running on http://localhost:${PORT}`);
 });

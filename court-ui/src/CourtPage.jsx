@@ -1,19 +1,32 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function CourtPage() {
 
   const { id } = useParams();
   const [players, setPlayers] = useState(0);
   const [isCheckedIn, setIsCheckedIn] = useState(false); //track if checked in state
+  const [court, setCourt] = useState(null)
   const [remainingTime, setRemainingTime] = useState(null);
 const [startTime, setStartTime] = useState(null);
+const navigate = useNavigate();
 
   const fetchStatus = async () => {
     const res = await fetch(`http://localhost:3000/court/${id}/status`);
     const data = await res.json();
     setPlayers(data.active_players);
   };
+
+
+  const fetchCourtInfo = async () => {
+  const res = await fetch("http://localhost:3000/courts");
+  const data = await res.json();
+
+  const found = data.find(c => String(c.id) === String(id));
+
+  setCourt(found);
+};
 
   // check in route for court page
 const checkIn = async () => {
@@ -101,6 +114,7 @@ useEffect(() => {
 useEffect(() => {
 
   fetchStatus();
+  fetchCourtInfo();   
 // store use signed in 
   const storedCourt = localStorage.getItem("activeCourt");
 
@@ -135,6 +149,10 @@ return (
       <h2 style={{ marginBottom: 20 }}>
         Active Players: {players}
       </h2>
+
+      <p>
+        Total Courts: {court?.num_of_courts}
+      </p>
 
 {isCheckedIn && (
   <div style={{
@@ -192,6 +210,22 @@ return (
       Check In
     </button>
   )}
+<br />
+  
+  <button
+    onClick={() => navigate("/")}
+    style={{
+      marginTop: 15,
+      padding: "10px 18px",
+      background: "#1677ff",
+      color: "white",
+      border: "none",
+      borderRadius: 6,
+      cursor: "pointer"
+    }}
+  >
+    ← Back to Map
+  </button> 
 
 </div>
       </div>

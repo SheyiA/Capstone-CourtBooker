@@ -152,7 +152,20 @@ app.get("/admin/analytics", async(req, res) => {
     }
 });
 
+app.get("/analytics/usage", async(req, res) => {
 
+    const result = await pool.query(`
+    SELECT 
+      TO_CHAR(checkin_time, 'HH24:MI') as time,
+      COUNT(*) as sessions
+    FROM usage_logs
+    GROUP BY time
+    ORDER BY MIN(checkin_time)
+    LIMIT 20
+  `);
+
+    res.json(result.rows);
+});
 
 
 /* ================= START SERVER LAST ================= */

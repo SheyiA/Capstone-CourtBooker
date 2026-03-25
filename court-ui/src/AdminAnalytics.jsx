@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import UsageChart from "./UsageChart";
 
 function AdminAnalytics() {
 
@@ -44,7 +46,7 @@ function AdminAnalytics() {
         }}>
 
           <div style={cardStyle}>
-            <h3>Total Active Players</h3>
+            <h3>Current Active Players</h3>
             <p style={bigNumber}>{analytics.total_active_players}</p>
           </div>
 
@@ -98,6 +100,27 @@ function AdminAnalytics() {
         </div>
 
       </div>
+
+<div style={{ marginTop: 30 }}>
+  <UsageChart />
+</div>
+
+<br /><br /><br />
+ <Link
+    to="../"
+    style={{
+      padding: "12px 20px",
+      background: "#722ed1",
+      color: "white",
+      textDecoration: "none",
+      borderRadius: 8,
+      fontWeight: "bold",
+      boxShadow: "0 4px 10px rgba(0,0,0,0.1)"
+    }}
+  >
+    Back to Dashboard
+  </Link>
+
     </div>
   );
 }

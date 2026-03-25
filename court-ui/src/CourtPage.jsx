@@ -12,15 +12,17 @@ function CourtPage() {
 const [startTime, setStartTime] = useState(null);
 const navigate = useNavigate();
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
   const fetchStatus = async () => {
-    const res = await fetch(`http://localhost:3000/court/${id}/status`);
+    const res = await fetch(`${API_BASE}/court/${id}/status`);
     const data = await res.json();
     setPlayers(data.active_players);
   };
 
 
   const fetchCourtInfo = async () => {
-  const res = await fetch("http://localhost:3000/courts");
+  const res = await fetch(`${API_BASE}/courts`);
   const data = await res.json();
 
   const found = data.find(c => String(c.id) === String(id));
@@ -33,7 +35,7 @@ const checkIn = async () => {
 
   if (isCheckedIn) return;
 
-  const res = await fetch("http://localhost:3000/checkin", {
+  const res = await fetch(`${API_BASE}/checkin`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ court_id: id })
@@ -58,7 +60,7 @@ const checkOut = async () => {
 
   if (!isCheckedIn) return;
 
-  await fetch("http://localhost:3000/checkout", {
+  await fetch(`${API_BASE}/checkout`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ court_id: id })

@@ -5,10 +5,11 @@ import UsageChart from "./UsageChart";
 function AdminAnalytics() {
 
   const [analytics, setAnalytics] = useState(null);
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
   const loadAnalytics = async () => {
     try {
-      const res = await fetch("http://localhost:3000/admin/analytics");
+      const res = await fetch(`${API_BASE}/admin/analytics`);
       const data = await res.json();
       setAnalytics(data);
     } catch (err) {

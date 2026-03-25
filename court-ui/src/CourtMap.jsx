@@ -7,6 +7,9 @@ function CourtMap() {
   const [courts, setCourts] = useState([]);
   const [userPos, setUserPos] = useState(null);
 
+
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
   useEffect(() => {
   navigator.geolocation.getCurrentPosition(
     (pos) => {
@@ -28,13 +31,13 @@ function CourtMap() {
   }, []);
 
 const fetchCourts = async () => {
-  const res = await fetch("http://localhost:3000/courts");
+  const res = await fetch(`${API_BASE}/courts`);
   const data = await res.json();
 
   const courtsWithStatus = await Promise.all(
     data.map(async (court) => {
       const statusRes = await fetch(
-        `http://localhost:3000/court/${court.id}/status`
+        `${API_BASE}/court/${court.id}/status`
       );
       const statusData = await statusRes.json();
 

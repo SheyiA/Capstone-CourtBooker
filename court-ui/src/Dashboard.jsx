@@ -7,6 +7,10 @@ function Dashboard() {
   const [occupancy, setOccupancy] = useState({});
   const [selectedRegion, setSelectedRegion] = useState("ALL");
 
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
+console.log("API BASE =", API_BASE);
+
+
   useEffect(() => {
     loadCourts();
   }, []);
@@ -32,7 +36,7 @@ const filteredCourts =
 
 
   const loadCourts = async () => {
-    const res = await fetch("http://localhost:3000/courts");
+    const res = await fetch(`${API_BASE}/courts`);
     const data = await res.json();
     setCourts(data);
 
@@ -40,7 +44,7 @@ const filteredCourts =
   };
 
 const fetchStatus = async (courtId) => {
-  const res = await fetch(`http://localhost:3000/court/${courtId}/status`);
+  const res = await fetch(`${API_BASE}/court/${courtId}/status`);
   const data = await res.json();
 
   setOccupancy(prev => ({

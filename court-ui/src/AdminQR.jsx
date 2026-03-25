@@ -4,10 +4,10 @@ import QRCode from "react-qr-code";
 function AdminQR() {
 
 const [courts, setCourts] = useState([]);
-
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 const fetchCourts = async () => {
-const res = await fetch("http://localhost:3000/courts");
+const res = await fetch(`${API_BASE}/courts`);
 const data = await res.json();
 setCourts(data);
 };
@@ -46,7 +46,7 @@ minHeight: "100vh"
 
 <div style={{ background: "white", padding: 12 }}>
   <QRCode
-    value={`http://localhost:5173/court/${court.id}`}
+    value={`${API_BASE}/court/${court.id}`}
     style={{ height: 160, width: 160 }}
   />
 </div>

@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 /* ================= ROUTES ================= */
-
+console.log("DB URL starts with:", process.env.DATABASE_URL.substring(0, 10));
 // CHECKIN
 app.post("/checkin", async(req, res) => {
     const { court_id } = req.body;
@@ -50,7 +50,7 @@ app.post("/checkin", async(req, res) => {
 // STATUS
 app.get("/court/:id/status", async(req, res) => {
     const courtId = req.params.id;
-
+    console.log("STATUS HIT FOR COURT:", req.params.id);
     try {
         const result = await pool.query(
             `SELECT COUNT(*) AS active_players

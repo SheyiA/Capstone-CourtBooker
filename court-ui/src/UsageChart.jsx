@@ -12,7 +12,7 @@ import {
 function UsageChart() {
 
   const [data, setData] = useState([]);
-
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
   useEffect(() => {
     loadUsage();
 
@@ -21,7 +21,7 @@ function UsageChart() {
   }, []);
 
   const loadUsage = async () => {
-    const res = await fetch("http://localhost:3000/analytics/usage");
+    const res = await fetch(`${API_BASE}/analytics/usage`);
     const usage = await res.json();
     setData(usage);
   };

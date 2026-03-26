@@ -146,7 +146,10 @@ return (
       borderRadius: 10,
       boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
     }}>
-      <h1 style={{ marginBottom: 10 }}>Court {id}</h1>
+
+<h1 style={{ marginBottom: 10 }}>
+  {court ? court.name : `Court ${id}`}
+</h1>
 
       <h2 style={{ marginBottom: 20 }}>
         Active Players: {players}

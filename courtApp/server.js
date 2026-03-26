@@ -50,7 +50,7 @@ app.post("/checkin", async(req, res) => {
 // STATUS
 app.get("/court/:id/status", async(req, res) => {
     const courtId = req.params.id;
-    console.log("STATUS HIT FOR COURT:", req.params.id);
+    // console.log("STATUS HIT FOR COURT:", req.params.id);
     try {
         const result = await pool.query(
             `SELECT COUNT(*) AS active_players

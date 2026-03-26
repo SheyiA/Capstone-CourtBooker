@@ -10,7 +10,6 @@ app.use(cors());
 app.use(express.json());
 
 /* ================= ROUTES ================= */
-console.log("DB URL starts with:", process.env.DATABASE_URL.substring(0, 10));
 // CHECKIN
 app.post("/checkin", async(req, res) => {
     const { court_id } = req.body;

@@ -5,6 +5,7 @@ function AdminQR() {
 
 const [courts, setCourts] = useState([]);
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const FRONTEND_URL = "https://capstone-courtbooker-1.onrender.com";
 
 const fetchCourts = async () => {
 const res = await fetch(`${API_BASE}/courts`);
@@ -26,6 +27,7 @@ background: "#f4f6f8",
 minHeight: "100vh"
 }}> <h1>QR Code Generator — City Courts</h1>
 
+{courts.length === 0 && <p>Loading courts...</p>}
 
   <div style={{
     display: "grid",
@@ -46,9 +48,13 @@ minHeight: "100vh"
 
 <div style={{ background: "white", padding: 12 }}>
   <QRCode
-    value={`${API_BASE}/court/${court.id}`}
+value={`${FRONTEND_URL}/court/${court.id}`}
     style={{ height: 160, width: 160 }}
   />
+
+  <p style={{ fontSize: 10, marginTop: 5 }}>
+  {`${FRONTEND_URL}/court/${court.id}`}
+</p>
 </div>
 
         <p style={{ marginTop: 10, fontSize: 12 }}>

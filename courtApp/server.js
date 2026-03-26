@@ -50,23 +50,28 @@ app.post("/checkin", async(req, res) => {
 // STATUS
 app.get("/court/:id/status", async(req, res) => {
     const courtId = req.params.id;
-    // console.log("STATUS HIT FOR COURT:", req.params.id);
+    console.log("STATUS HIT FOR COURT:", courtId);
+
     try {
         const result = await pool.query(
-            `SELECT COUNT(*) AS active_players
-       FROM sessions
-       WHERE court_id = $1
-       AND status = 'active'
-       AND start_time > NOW() - INTERVAL '30 minutes'`, [courtId]
+            `SELECT COUNT(*)::int AS active_players
+             FROM sessions
+             WHERE court_id = $1
+             AND status = 'active'
+             AND start_time IS NOT NULL
+             AND start_time > NOW() - INTERVAL '30 minutes'`, [courtId]
         );
+
+        const count = result.rows ? .[0] ? .active_players ? ? 0;
 
         res.json({
             court_id: courtId,
-            active_players: parseInt(result.rows[0].active_players)
+            active_players: count
         });
 
     } catch (err) {
-        res.status(500).json({ error: "Database error" });
+        console.error("STATUS ROUTE DB ERROR:", err);
+        res.status(500).json({ error: err.message });
     }
 });
 

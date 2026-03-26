@@ -3,7 +3,8 @@ const cors = require("cors");
 const pool = require("./db");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+
 
 app.use(cors());
 app.use(express.json());
@@ -170,6 +171,7 @@ app.get("/analytics/usage", async(req, res) => {
 
 /* ================= START SERVER LAST ================= */
 
+
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });

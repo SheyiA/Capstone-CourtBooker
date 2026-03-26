@@ -62,7 +62,11 @@ app.get("/court/:id/status", async(req, res) => {
              AND start_time > NOW() - INTERVAL '30 minutes'`, [courtId]
         );
 
-        const count = result.rows ? .[0] ? .active_players ? ? 0;
+        let count = 0;
+
+        if (result.rows && result.rows.length > 0) {
+            count = parseInt(result.rows[0].active_players);
+        }
 
         res.json({
             court_id: courtId,
@@ -74,8 +78,6 @@ app.get("/court/:id/status", async(req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-
-
 // COURTS
 app.get("/courts", async(req, res) => {
     const result = await pool.query("SELECT * FROM courts ORDER BY id");

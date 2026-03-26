@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import QRCode from "react-qr-code";
+import { QRCode } from "react-qr-code";
 
 function AdminQR() {
 
@@ -44,7 +44,7 @@ minHeight: "100vh"
         textAlign: "center"
       }}>
         <h2>{court.name}</h2>
-        <p>{court.location}</p>
+        {/* <p>{court.location}</p> */}
 
 <div style={{ background: "white", padding: 12 }}>
   <QRCode

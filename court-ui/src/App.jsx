@@ -12,7 +12,7 @@ function App() {
 >    <Routes>
       <Route path="/" element={<Dashboard />} />
       <Route path="/court/:id" element={<CourtPage />} />
-      {/* <Route path="/admin/qr" element={<AdminQR />} /> */}
+      <Route path="/admin/qr" element={<AdminQR />} />
       <Route path="/admin/analytics" element={<AdminAnalytics />} />
     </Routes>
     </Layout>

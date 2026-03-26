@@ -107,6 +107,24 @@ const getStatusColor = (active, total) => {
   >
     📊 View Analytics
   </Link>
+<br />
+<br />
+<br />
+ <Link
+    to="/admin/qr"
+    style={{
+      padding: "12px 20px",
+      background: "#722ed1",
+      color: "white",
+      textDecoration: "none",
+      borderRadius: 8,
+      fontWeight: "bold",
+      boxShadow: "0 4px 10px rgba(0,0,0,0.1)"
+    }}
+  >
+    QR Codes
+  </Link>
+
   <br /><br /><br />
  <CourtMap />
 

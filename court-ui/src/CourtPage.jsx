@@ -36,9 +36,25 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL;
   setCourt(found);
 };
 
+
+
+
   // check in route for court page
 const checkIn = async () => {
 
+  const existingCourt = localStorage.getItem("activeCourt");
+// if existing court and existing court is not the same as id alert user that they are already checked in to a different court
+  if (existingCourt && existingCourt !== id) {
+    alert(`You are already checked into Court ${existingCourt}`);
+      navigate(`/court/${existingCourt}`);
+    return;
+  }
+
+  
+
+
+
+// if already checked in to this court return
   if (isCheckedIn) return;
 
   const res = await fetch(`${API_BASE}/checkin`, {
@@ -46,20 +62,21 @@ const checkIn = async () => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ court_id: id })
   });
-
+// if response is not ok alert user with error message
   const data = await res.json();
 
   if (!res.ok) {
-    alert(data.error);   //show backend message
+    alert(data.error);
     return;
   }
-// local storage of activecourt id 
+// set local storage to active court and check in time and set states to checked in and start time
   localStorage.setItem("activeCourt", id);
-const now = Date.now();
-localStorage.setItem("checkinTime", now);
 
-setStartTime(now);
-setIsCheckedIn(true);
+  const now = Date.now();
+  localStorage.setItem("checkinTime", now);
+
+  setStartTime(now);
+  setIsCheckedIn(true);
 };
 // check out route for court page
 const checkOut = async () => {

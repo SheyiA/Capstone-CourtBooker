@@ -1,3 +1,7 @@
+/*
+Name: Sheyi Adepoju
+Description: This seciton is used to setupt header and footer of the application this is where consistency will be moved throughout all pages and easily be importated and manipulated in one file
+*/
 import { Link } from "react-router-dom";
 import logo from "./citycalgary.png";
 function Layout({ children }) {

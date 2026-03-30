@@ -1,3 +1,8 @@
+/*
+Name: Sheyi Adepoju
+Description: This usage chart is used to populate the analytics chart with information called upon from created and retrieable statistics. 
+*/
+// imports for chart this chart is not really ready and lacks functionality due amount of people that wil be using the application. 
 import { useEffect, useState } from "react";
 import {
   LineChart,
@@ -10,9 +15,9 @@ import {
 } from "recharts";
 
 function UsageChart() {
-
+// set states
   const [data, setData] = useState([]);
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = import.meta.env.VITE_API_BASE_URL; // set api url 
   useEffect(() => {
     loadUsage();
 

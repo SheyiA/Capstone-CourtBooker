@@ -1,15 +1,20 @@
+/**
+ * Name: Sheyi adepoju
+ * Description: this file will create the dynamic court map using infromation from teh database of the longitude and latitude and will use the libraries to add all of them to the map 
+ */
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import { useNavigate } from "react-router-dom";
 
 function CourtMap() {
+  // set states 
   const [courts, setCourts] = useState([]);
   const [userPos, setUserPos] = useState(null);
 
 
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
-
+// set position based on coordinates
   useEffect(() => {
   navigator.geolocation.getCurrentPosition(
     (pos) => {
@@ -19,6 +24,7 @@ function CourtMap() {
       ]);
     },
     () => {
+      // error if unable to connect 
       console.log("Location permission denied");
     }
   );
@@ -29,7 +35,7 @@ function CourtMap() {
       const interval = setInterval(fetchCourts, 5000);
   return () => clearInterval(interval);
   }, []);
-
+// fetch courts asynchronously and map them 
 const fetchCourts = async () => {
   const res = await fetch(`${API_BASE}/courts`);
   const data = await res.json();
@@ -51,7 +57,7 @@ const fetchCourts = async () => {
   setCourts(courtsWithStatus);
 };
 
-
+// get court status and set to rate of low medium or high
 const getCourtStatus = (active, total) => {
   const percent = active / total;
 
@@ -60,7 +66,7 @@ const getCourtStatus = (active, total) => {
   return "high";
 };
 
-
+// colors of pins based on business
 const getColor = (active, total) => {
   const status = getCourtStatus(active, total);
 
@@ -68,7 +74,7 @@ const getColor = (active, total) => {
   if (status === "medium") return "orange";
   return "red";
 };
-
+// fcreate pin icon based on link 
 const createIcon = (color) =>
   new L.Icon({
     iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`,

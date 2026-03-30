@@ -1,9 +1,15 @@
+/*
+Name: Sheyi Adepoju
+Description: create court page with the court infomation cards that is unique to each city
+*/
+
+
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function CourtPage() {
-
+// set states
   const { id } = useParams();
   const [players, setPlayers] = useState(0);
   const [isCheckedIn, setIsCheckedIn] = useState(false); //track if checked in state
@@ -11,9 +17,9 @@ function CourtPage() {
   const [remainingTime, setRemainingTime] = useState(null);
 const [startTime, setStartTime] = useState(null);
 const navigate = useNavigate();
-
+// api base connected to env
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
-
+// status to court 
   const fetchStatus = async () => {
     const res = await fetch(`${API_BASE}/court/${id}/status`);
     const data = await res.json();
@@ -44,10 +50,10 @@ const checkIn = async () => {
   const data = await res.json();
 
   if (!res.ok) {
-    alert(data.error);   // ⭐ shows backend message
+    alert(data.error);   //show backend message
     return;
   }
-
+// local storage of activecourt id 
   localStorage.setItem("activeCourt", id);
 const now = Date.now();
 localStorage.setItem("checkinTime", now);
@@ -74,7 +80,7 @@ const checkOut = async () => {
 };
 
 
-
+// if stored court and stored time is in the id set it to true 
 useEffect(() => {
   const storedCourt = localStorage.getItem("activeCourt");
   const storedTime = localStorage.getItem("checkinTime");
@@ -93,7 +99,7 @@ useEffect(() => {
 
     const elapsed = Math.floor((Date.now() - startTime) / 1000);
     const remaining = 1800 - elapsed;
-
+// remove sessions and checkedin people 
     if (remaining <= 0) {
       setIsCheckedIn(false);
       localStorage.removeItem("activeCourt");
@@ -119,7 +125,7 @@ useEffect(() => {
   fetchCourtInfo();   
 // store use signed in 
   const storedCourt = localStorage.getItem("activeCourt");
-
+// if stored court is id set is checked in to true 
   if (storedCourt == id) {
     setIsCheckedIn(true);
   }

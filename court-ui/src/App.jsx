@@ -1,3 +1,8 @@
+/**
+ * Sheyi adepoju
+ * this folder is getting all pages routed and imported so it can all be found 
+ */
+
 import { Routes, Route } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import CourtPage from "./CourtPage";

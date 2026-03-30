@@ -1,3 +1,8 @@
+/*
+Name: Sheyi Adepoju
+Description: This db filder to open the connection process to connect the data base with the api this is necessary for the backend communication. I created the database with pgAdmin and later made a connection on render to be able to host the database on the cloud to have access constantly to satisfy the MVP
+*/
+
 require("dotenv").config(); // Load environment variables from .env file
 
 const { Pool } = require("pg");

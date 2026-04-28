@@ -15,6 +15,9 @@ const pool = new Pool({
     // password: process.env.DB_PASSWORD, // your password
     // port: process.env.DB_PORT, // default PostgreSQL port
     connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false, // This is necessary for some hosting providers like Heroku
+    },
 });
 
 // Test the connection when the pool is created
@@ -28,5 +31,5 @@ const pool = new Pool({
 
 // Release the client back to the pool immediately if just testing the connection
 //});
-
+console.log("DATABASE_URL:", process.env.DATABASE_URL);
 module.exports = pool;
